@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignalDesk AI | Incident Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <p class="eyebrow">SIGNALDESK AI</p>
+            <h1>Incident Assistant</h1>
+            <p class="subtitle">
+                Describe a technical issue to begin troubleshooting.
+            </p>
+        </header>
+
+        <section class="panel">
+            <form id="incident-form">
+                <label for="title">Issue title</label>
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    minlength="3"
+                    maxlength="120"
+                    placeholder="e.g. Login returns a 500 error"
+                    required
+                >
+
+                <label for="description">Describe the problem</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    minlength="10"
+                    maxlength="2000"
+                    rows="5"
+                    placeholder="What happened? When did it start? What have you tried?"
+                    required
+                ></textarea>
+
+                <button id="submit-button" type="submit">
+                    Submit incident
+                </button>
+            </form>
+
+            <p id="status" role="status" aria-live="polite"></p>
+
+            <section id="result" class="result" hidden>
+                <h2>Incident received</h2>
+                <p id="result-title"></p>
+                <p id="result-message"></p>
+                <p id="result-state" class="tag"></p>
+            </section>
+        </section>
+
+        <footer>
+            Prototype · AI-assisted incident triage
+        </footer>
+    </main>
+
+    <script>
+        const form = document.getElementById("incident-form");
+        const button = document.getElementById("submit-button");
+        const statusMessage = document.getElementById("status");
+        const result = document.getElementById("result");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById("title").value.trim();
+            const description = document.getElementById("description").value.trim();
+
+            statusMessage.textContent = "";
+            result.hidden = true;
+            button.disabled = true;
+            button.textContent = "Submitting...";
+
+            try {
+                const response = await fetch(
+                    "http://127.0.0.1:8000/incidents/preview",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ title, description })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail
+                            ? JSON.stringify(data.detail)
+                            : "The server rejected the request."
+                    );
+                }
+
+                document.getElementById("result-title").textContent =
+                    data.title;
+
+                document.getElementById("result-message").textContent =
+                    data.message;
+
+                document.getElementById("result-state").textContent =
+                    "Status: " + data.status;
+
+                result.hidden = false;
+                statusMessage.textContent = "Submission successful.";
+            } catch (error) {
+                statusMessage.textContent =
+                    "Could not submit the incident. " + error.message;
+            } finally {
+                button.disabled = false;
+                button.textContent = "Submit incident";
+            }
+        });
+    </script>
+</body>
+</html>
