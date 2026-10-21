@@ -49,10 +49,14 @@
             <p id="status" role="status" aria-live="polite"></p>
 
             <section id="result" class="result" hidden>
-                <h2>Incident received</h2>
+                <h3>Incident analysis</h3>
                 <p id="result-title"></p>
-                <p id="result-message"></p>
-                <p id="result-state" class="tag"></p>
+                <p id="result-description"></p>
+                <p id="result-category"></p>
+                <p id="category-reason" class="muted"></p>
+                <p id="result-priority"></p>
+                <p id="priority-reason" class="muted"></p>
+                <p id="result-status" class="muted"></p>
             </section>
         </section>
 
@@ -62,6 +66,7 @@
     </main>
 
     <script>
+       
         const form = document.getElementById("incident-form");
         const button = document.getElementById("submit-button");
         const statusMessage = document.getElementById("status");
@@ -76,11 +81,11 @@
             statusMessage.textContent = "";
             result.hidden = true;
             button.disabled = true;
-            button.textContent = "Submitting...";
+            button.textContent = "Analyzing...";
 
             try {
                 const response = await fetch(
-                    "http://127.0.0.1:8000/incidents/preview",
+                    "http://127.0.0.1:8000/incidents/analyze",
                     {
                         method: "POST",
                         headers: {
@@ -93,25 +98,39 @@
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(
-                        data.detail
-                            ? JSON.stringify(data.detail)
-                            : "The server rejected the request."
-                    );
+                    const details = Array.isArray(data.detail)
+                        ? data.detail.map(item => item.msg).join(", ")
+                        : data.detail || "Request failed.";
+
+                    throw new Error(details);
                 }
 
                 document.getElementById("result-title").textContent =
-                    data.title;
+                    "Title: " + data.title;
 
-                document.getElementById("result-message").textContent =
-                    data.message;
+                document.getElementById("result-description").textContent =
+                    "Description: " + data.description;
 
-                document.getElementById("result-state").textContent =
+                document.getElementById("result-category").textContent =
+                    "Category: " + data.category;
+
+                document.getElementById("category-reason").textContent =
+                    "Why this category? " + data.category_reason;
+
+                document.getElementById("result-priority").textContent =
+                    "Priority: " + data.priority;
+
+                document.getElementById("priority-reason").textContent =
+                    "Why this priority? " + data.priority_reason;
+
+                document.getElementById("result-status").textContent =
                     "Status: " + data.status;
 
                 result.hidden = false;
-                statusMessage.textContent = "Submission successful.";
+                statusMessage.textContent = "Incident analyzed successfully.";
+
             } catch (error) {
+                console.error(error);
                 statusMessage.textContent =
                     "Could not submit the incident. " + error.message;
             } finally {
@@ -119,6 +138,7 @@
                 button.textContent = "Submit incident";
             }
         });
+
     </script>
 </body>
 </html>

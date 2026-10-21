@@ -1,45 +1,34 @@
 
-# SignalDesk AI
+## Incident Classification and Priority
 
-An AI-assisted incident triage and resolution assistant.
+SignalDesk AI currently uses rule-based keyword matching to
+classify incidents and estimate their priority.
 
-## Problem
+### Categories
+- Security
+- Database
+- Network
+- Application / Backend
+- Performance
+- General
 
-Technical support teams receive incident reports that can be
-difficult to classify, prioritize, and resolve consistently.
+### Priority levels
+- High
+- Medium
+- Low
 
-SignalDesk AI aims to help users classify incidents, retrieve
-similar past issues, and suggest evidence-based troubleshooting.
+### Explainability
+The API returns a reason for both the selected category and
+priority, helping users understand the result.
 
-## Planned features
+### Current limitations
+- Keyword rules can misclassify ambiguous reports.
+- Priority is an estimate, not a guaranteed severity assessment.
+- The classifier is rule-based; it is not a trained ML model.
+- Human review is required before taking operational action.
 
-- Incident submission and validation
-- Incident classification and prioritization
-- Similar-incident retrieval
-- Knowledge-based troubleshooting suggestions
-- Human approval for proposed actions
+### API endpoint
+POST `/incidents/analyze`
 
-## Technology
-
-- Python
-- FastAPI
-- Pydantic
-- scikit-learn
-- HTML, CSS, and JavaScript
-
-## Run locally
-
-Create and activate a Python virtual environment, then install:
-
-    pip install -r requirements.txt
-
-Run the backend from the project root:
-
-    python -m uvicorn backend.main:app --reload
-
-Open http://127.0.0.1:8000/docs to test the API.
-
-## Project status
-
-Initial backend prototype. AI-assisted classification,
-retrieval, and resolution features are under development.
+Accepts an incident title and description and returns the
+incident details, category, priority, and explanations.
