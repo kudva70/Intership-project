@@ -130,3 +130,20 @@ footer {
     display: none !important;
 }
     
+.similar-incident {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #d8dce3;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.similar-incident h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.similar-incident p {
+    margin: 6px 0;
+    line-height: 1.5;
+}

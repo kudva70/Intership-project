@@ -57,7 +57,10 @@
                 <p id="result-priority"></p>
                 <p id="priority-reason" class="muted"></p>
                 <p id="result-status" class="muted"></p>
+                
             </section>
+            <h3>Similar past incidents</h3>
+            <div id="similar-incidents"></div>
         </section>
 
         <footer>
@@ -127,6 +130,41 @@
                     "Status: " + data.status;
 
                 result.hidden = false;
+                const matchesContainer =
+                document.getElementById("similar-incidents");
+
+                matchesContainer.replaceChildren();
+
+                if (data.similar_incidents.length === 0) {
+                    const emptyMessage = document.createElement("p");
+                    emptyMessage.textContent =
+                        "No sufficiently similar incidents were found.";
+                    matchesContainer.appendChild(emptyMessage);
+                } else {
+                    data.similar_incidents.forEach((incident) => {
+                        const card = document.createElement("article");
+                        card.className = "similar-incident";
+
+                        const heading = document.createElement("h4");
+                        heading.textContent =
+                            `${incident.id} — ${incident.title}`;
+
+                        const category = document.createElement("p");
+                        category.textContent =
+                            `Category: ${incident.category} | Priority: ${incident.priority}`;
+
+                        const score = document.createElement("p");
+                        score.textContent =
+                            `Text similarity: ${incident.similarity}%`;
+
+                        const resolution = document.createElement("p");
+                        resolution.textContent =
+                            `Previous resolution: ${incident.resolution}`;
+
+                        card.append(heading, category, score, resolution);
+                        matchesContainer.appendChild(card);
+                    });
+                }
                 statusMessage.textContent = "Incident analyzed successfully.";
 
             } catch (error) {

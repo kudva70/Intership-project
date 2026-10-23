@@ -1,7 +1,25 @@
-
+import json
+from pathlib import Path
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+DATA_FILE = Path(__file__).parent / "data" / "incidents.json"
+
+with open(DATA_FILE, "r", encoding="utf-8") as file:
+    INCIDENTS = json.load(file)
+
+# Combine each incident's title and description for searching.
+incident_texts = [
+    f"{incident['title']} {incident['description']}"
+    for incident in INCIDENTS
+]
+
+# Convert the incident text into numerical TF-IDF vectors.
+vectorizer = TfidfVectorizer(stop_words="english")
+incident_vectors = vectorizer.fit_transform(incident_texts)
 
 app = FastAPI(
     title="SignalDesk AI",
@@ -147,7 +165,12 @@ def preview_incident(incident: IncidentRequest):
 def analyze(incident: IncidentRequest):
     analysis = analyze_incident(
         incident.title,
-        incident.description,
+        incident.description
+    )
+
+    similar_incidents = find_similar_incidents(
+        incident.title,
+        incident.description
     )
 
     return {
@@ -155,4 +178,47 @@ def analyze(incident: IncidentRequest):
         "description": incident.description,
         "status": "analyzed",
         **analysis,
+        "similar_incidents": similar_incidents,
     }
+
+
+def find_similar_incidents(title: str, description: str) -> list:
+    query = f"{title} {description}"
+
+    # Convert the new incident into the same numerical format.
+    query_vector = vectorizer.transform([query])
+
+    # Compare the new incident against all stored incidents.
+    scores = cosine_similarity(
+        query_vector,
+        incident_vectors
+    ).flatten()
+
+    # Rank incidents from most similar to least similar.
+    ranked_indices = scores.argsort()[::-1]
+
+    matches = []
+
+    for index in ranked_indices:
+        score = float(scores[index])
+
+        # Skip incidents with no shared searchable features.
+        if score <= 0:
+            continue
+
+        incident = INCIDENTS[index]
+
+        matches.append({
+            "id": incident["id"],
+            "title": incident["title"],
+            "description": incident["description"],
+            "category": incident["category"],
+            "priority": incident["priority"],
+            "resolution": incident["resolution"],
+            "similarity": round(score * 100, 2)
+        })
+
+        if len(matches) == 3:
+            break
+
+    return matches

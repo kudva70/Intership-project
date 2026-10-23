@@ -1,0 +1,67 @@
+
+[
+  {
+    "id": "INC001",
+    "title": "Login returns a 500 error",
+    "description": "Users cannot log in after a backend deployment.",
+    "category": "Application / Backend",
+    "priority": "High",
+    "resolution": "Check application logs, review the latest deployment, and verify authentication service health."
+  },
+  {
+    "id": "INC002",
+    "title": "Database connection timeout",
+    "description": "The application cannot connect to the database and dashboard requests fail.",
+    "category": "Database",
+    "priority": "High",
+    "resolution": "Check database availability, connection settings, network access, and connection pool limits."
+  },
+  {
+    "id": "INC003",
+    "title": "Slow dashboard loading",
+    "description": "The dashboard takes a long time to load due to slow API responses.",
+    "category": "Performance",
+    "priority": "Medium",
+    "resolution": "Inspect API response times, check slow database queries, and review application performance metrics."
+  },
+  {
+    "id": "INC004",
+    "title": "DNS resolution failure",
+    "description": "The service cannot resolve the hostname of an external API.",
+    "category": "Network",
+    "priority": "Medium",
+    "resolution": "Verify the hostname, DNS configuration, network connectivity, and external service availability."
+  },
+  {
+    "id": "INC005",
+    "title": "Suspicious login attempt",
+    "description": "Multiple unexpected login attempts were detected on a user account.",
+    "category": "Security",
+    "priority": "High",
+    "resolution": "Follow the security incident process, review authentication logs, and escalate to the security team."
+  },
+  {
+    "id": "INC006",
+    "title": "Database query failed",
+    "description": "A SQL query fails while loading customer records.",
+    "category": "Database",
+    "priority": "Medium",
+    "resolution": "Inspect the query, validate the schema and parameters, and review the database error logs."
+  },
+  {
+    "id": "INC007",
+    "title": "Intermittent API connection failure",
+    "description": "Requests to the API occasionally fail with connection errors.",
+    "category": "Network",
+    "priority": "Medium",
+    "resolution": "Check network connectivity, API health, timeout settings, and relevant service logs."
+  },
+  {
+    "id": "INC008",
+    "title": "Application deployment failed",
+    "description": "The latest deployment failed and the application is not starting correctly.",
+    "category": "Application / Backend",
+    "priority": "High",
+    "resolution": "Review deployment logs, validate environment variables, and check application startup errors."
+  }
+]
