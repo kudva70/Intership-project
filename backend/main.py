@@ -21,6 +21,28 @@ incident_texts = [
 vectorizer = TfidfVectorizer(stop_words="english")
 incident_vectors = vectorizer.fit_transform(incident_texts)
 
+
+KNOWLEDGE_FILE = (
+    Path(__file__).parent / "data" / "troubleshooting.json"
+)
+
+with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as file:
+    KNOWLEDGE_BASE = json.load(file)
+
+knowledge_texts = [
+    (
+        f"{item['title']} "
+        f"{item['keywords']} "
+        f"{item['category']} "
+        f"{' '.join(item['symptoms'])}"
+    )
+    for item in KNOWLEDGE_BASE
+]
+
+knowledge_vectorizer = TfidfVectorizer(stop_words="english")
+knowledge_vectors = knowledge_vectorizer.fit_transform(knowledge_texts)
+
+
 app = FastAPI(
     title="SignalDesk AI",
     description="AI-assisted incident triage and resolution",
@@ -161,6 +183,7 @@ def preview_incident(incident: IncidentRequest):
     }
 
 
+
 @app.post("/incidents/analyze")
 def analyze(incident: IncidentRequest):
     analysis = analyze_incident(
@@ -173,13 +196,33 @@ def analyze(incident: IncidentRequest):
         incident.description
     )
 
+    guides = find_troubleshooting_guides(
+        incident.title,
+        incident.description,
+        analysis["category"]
+    )
+
+    if guides:
+        recommended_team = guides[0]["recommended_team"]
+        suggested_action = guides[0]["suggested_action"]
+    else:
+        recommended_team = "General Support"
+        suggested_action = (
+            "Gather more information and request human review."
+        )
+
     return {
         "title": incident.title,
         "description": incident.description,
         "status": "analyzed",
         **analysis,
         "similar_incidents": similar_incidents,
-    }
+        "troubleshooting_guides": guides,
+        "recommended_team": recommended_team,
+        "suggested_action": suggested_action,
+        "requires_human_approval": True
+        }
+
 
 
 def find_similar_incidents(title: str, description: str) -> list:
@@ -219,6 +262,51 @@ def find_similar_incidents(title: str, description: str) -> list:
         })
 
         if len(matches) == 3:
+            break
+
+    return matches
+
+
+def find_troubleshooting_guides(
+    title: str,
+    description: str,
+    category: str,
+    limit: int = 2
+) -> list:
+    query = f"{title} {description} {category}"
+
+    query_vector = knowledge_vectorizer.transform([query])
+
+    scores = cosine_similarity(
+        query_vector,
+        knowledge_vectors
+    ).flatten()
+
+    ranked_indices = scores.argsort()[::-1]
+    matches = []
+
+    for index in ranked_indices:
+        score = float(scores[index])
+
+        # Avoid returning guides with no matching text features.
+        if score <= 0:
+            continue
+
+        guide = KNOWLEDGE_BASE[index]
+
+        matches.append({
+            "id": guide["id"],
+            "title": guide["title"],
+            "category": guide["category"],
+            "symptoms": guide["symptoms"],
+            "checks": guide["checks"],
+            "suggested_action": guide["suggested_action"],
+            "recommended_team": guide["team"],
+            "risk": guide["risk"],
+            "similarity": round(score * 100, 2)
+        })
+
+        if len(matches) >= limit:
             break
 
     return matches

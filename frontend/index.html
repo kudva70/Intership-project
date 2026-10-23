@@ -61,6 +61,13 @@
             </section>
             <h3>Similar past incidents</h3>
             <div id="similar-incidents"></div>
+            <h3>Troubleshooting guidance</h3>
+            <div id="troubleshooting-guides"></div>
+
+            <h3>Recommended next step</h3>
+            <p id="recommended-team"></p>
+            <p id="suggested-action"></p>
+            <p id="approval-status"></p>
         </section>
 
         <footer>
@@ -130,6 +137,73 @@
                     "Status: " + data.status;
 
                 result.hidden = false;
+                
+                const guidesContainer =
+                    document.getElementById("troubleshooting-guides");
+
+                guidesContainer.replaceChildren();
+
+                if (data.troubleshooting_guides.length === 0) {
+                    const emptyMessage = document.createElement("p");
+                    emptyMessage.textContent =
+                        "No matching troubleshooting guide found. Manual review is recommended.";
+                    guidesContainer.appendChild(emptyMessage);
+                } else {
+                    data.troubleshooting_guides.forEach((guide) => {
+                        const card = document.createElement("article");
+                        card.className = "similar-incident";
+
+                        const heading = document.createElement("h4");
+                        heading.textContent =
+                            `${guide.id} — ${guide.title}`;
+
+                        const category = document.createElement("p");
+                        category.textContent =
+                            `Category: ${guide.category} | Risk: ${guide.risk}`;
+
+                        const score = document.createElement("p");
+                        score.textContent =
+                            `Text similarity: ${guide.similarity}%`;
+
+                        const team = document.createElement("p");
+                        team.textContent =
+                            `Suggested team: ${guide.recommended_team}`;
+
+                        const checksHeading = document.createElement("p");
+                        checksHeading.textContent = "Diagnostic checks:";
+
+                        const checksList = document.createElement("ul");
+
+                        guide.checks.forEach((check) => {
+                            const item = document.createElement("li");
+                            item.textContent = check;
+                            checksList.appendChild(item);
+                        });
+
+                        card.append(
+                            heading,
+                            category,
+                            score,
+                            team,
+                            checksHeading,
+                            checksList
+                        );
+
+                        guidesContainer.appendChild(card);
+                    });
+                }
+
+                document.getElementById("recommended-team").textContent =
+                    "Recommended team: " + data.recommended_team;
+
+                document.getElementById("suggested-action").textContent =
+                    "Suggested action: " + data.suggested_action;
+
+                document.getElementById("approval-status").textContent =
+                    data.requires_human_approval
+                        ? "Approval required: A human must review the recommendation before any action is taken."
+                        : "No approval required.";
+
                 const matchesContainer =
                 document.getElementById("similar-incidents");
 

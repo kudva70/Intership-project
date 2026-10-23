@@ -1,14 +1,25 @@
-## Similar Incident Retrieval
 
-SignalDesk AI uses TF-IDF vectorization and cosine similarity
-to retrieve up to three relevant incidents from a local sample
-dataset.
+## Troubleshooting Knowledge Base
 
-Each result includes its incident ID, category, priority,
-similarity score, and recorded resolution.
+SignalDesk AI retrieves relevant troubleshooting guides using
+TF-IDF vectorization and cosine similarity.
 
-### Current limitations
-- Results depend on the quality and size of the sample dataset.
-- Similar wording does not guarantee the same root cause.
-- Similarity scores are not confidence probabilities.
-- Suggested resolutions require human review.
+Each guide provides:
+- Common symptoms
+- Diagnostic checks
+- A suggested next step
+- A recommended support team
+- A risk label
+
+## Human Approval and Safety
+
+The application proposes recommendations but does not execute
+operational actions automatically. Human review is required
+before any action is taken.
+
+## Current Limitations
+
+- The knowledge base contains sample records.
+- Similarity does not establish the root cause.
+- Team assignments and risk labels are preliminary suggestions.
+- The system does not execute repairs or modify production systems.

@@ -1,0 +1,93 @@
+
+[
+  {
+    "id": "KB001",
+    "title": "Application login failure",
+    "keywords": "login authentication 500 error backend deployment server error",
+    "category": "Application / Backend",
+    "symptoms": [
+      "Users cannot log in",
+      "Login requests return server errors"
+    ],
+    "checks": [
+      "Review application logs for errors around the time the issue started.",
+      "Check whether the latest deployment changed authentication settings.",
+      "Verify that the authentication service and required dependencies are healthy."
+    ],
+    "suggested_action": "Investigate application logs and validate the latest deployment before attempting a rollback.",
+    "team": "Application Support",
+    "risk": "Medium"
+  },
+  {
+    "id": "KB002",
+    "title": "Database connection failure",
+    "keywords": "database sql connection timeout query failed database unavailable",
+    "category": "Database",
+    "symptoms": [
+      "Database connections time out",
+      "Queries fail or data does not load"
+    ],
+    "checks": [
+      "Check whether the database service is reachable.",
+      "Review database connection settings and connection pool usage.",
+      "Inspect database logs for authentication, capacity, or query errors."
+    ],
+    "suggested_action": "Collect database health and connection error details before changing database settings.",
+    "team": "Database Support",
+    "risk": "Medium"
+  },
+  {
+    "id": "KB003",
+    "title": "Network or DNS connectivity issue",
+    "keywords": "network dns connection refused timeout cannot connect api hostname",
+    "category": "Network",
+    "symptoms": [
+      "A service cannot reach another service",
+      "Hostname resolution or connection attempts fail"
+    ],
+    "checks": [
+      "Verify the hostname and DNS configuration.",
+      "Check connectivity to the target service.",
+      "Review relevant network and service logs."
+    ],
+    "suggested_action": "Identify the failing connection path and escalate network changes to the responsible team.",
+    "team": "Network Support",
+    "risk": "Low"
+  },
+  {
+    "id": "KB004",
+    "title": "Slow application performance",
+    "keywords": "slow latency performance lagging dashboard api response delay",
+    "category": "Performance",
+    "symptoms": [
+      "Pages take too long to load",
+      "API responses are slower than expected"
+    ],
+    "checks": [
+      "Measure response times for affected endpoints.",
+      "Inspect slow database queries and application resource usage.",
+      "Compare current performance with a known healthy period."
+    ],
+    "suggested_action": "Gather performance measurements before making configuration or capacity changes.",
+    "team": "Application Support",
+    "risk": "Low"
+  },
+  {
+    "id": "KB005",
+    "title": "Suspicious account activity",
+    "keywords": "security password unauthorized hacked suspicious login security breach",
+    "category": "Security",
+    "symptoms": [
+      "Unexpected login attempts are detected",
+      "An account may have been accessed without authorization"
+    ],
+    "checks": [
+      "Preserve relevant authentication and security logs.",
+      "Follow the organization's security incident response procedure.",
+      "Escalate promptly to the authorized security team."
+    ],
+    "suggested_action": "Escalate for human security review. Do not perform account or system changes automatically.",
+    "team": "Security Team",
+    "risk": "High"
+  }
+]
